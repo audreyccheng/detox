@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+    <Arg name="threadpool"><New id="threadpool" class="org.eclipse.jetty.util.thread.QueuedThreadPool"/></Arg>
+    <Get name="ThreadPool">
+        <Set name="minThreads" type="int"><Property name="threads.min" default="100"/></Set>
+        <Set name="maxThreads" type="int"><Property name="threads.max" default="500"/></Set>
+        <Set name="idleTimeout" type="int"><Property name="threads.timeout" default="60000"/></Set>
+        <Set name="detailedDump">false</Set>
+    </Get>
+</Configure>

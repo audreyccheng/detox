@@ -1,0 +1,112 @@
+package shield.network.messages;
+
+/* To add a new message, add a message type in enum
+ *  Type and an optional corresponding
+ * field */
+
+message Message {
+
+  enum Type {
+    // Test messages for the test client
+    HelloMessage = 1;
+    GoodbyeMessage = 2;
+
+    // Protocol Messages
+
+    // Client Message 1 - 100
+    ClientReqMessage = 4;
+    ClientRespMessage = 5;
+
+    DataReqMessage = 101;
+    DataRespMessage = 102;
+
+  }
+
+  required Type messageType = 1;
+
+  // Add all possible messages as "optional" fields here
+
+  // Client Message 1 - 100
+  optional ClientMessageReq clientReqMsg = 3;
+  optional ClientMessageResp clientRespMsg = 4;
+  optional DataMessageReq dataReqMsg = 101;
+  optional DataMessageResp dataRespMsg = 102;
+
+}
+
+message Statement {
+
+  enum Type {
+    // Read operation
+    READ = 1;
+    // Write operation
+    WRITE = 2;
+    // Delete operation
+    DELETE = 3;
+    // Atomic read-modify-write operation
+    READ_FOR_UPDATE = 4;
+    // Dummy write operation
+    DUMMY = 5;
+  }
+
+  required Type opType = 1;
+  required uint64 key = 2;
+  optional bytes value = 3;
+
+}
+
+
+message ClientMessageReq {
+
+  required uint64 clientId = 1;
+
+  optional bool register = 2;
+  optional bool toStart = 3;
+  optional bool toCommit = 4;
+  optional bool toAbort = 5;
+
+  optional string clientHost = 6;
+  optional uint32 clientPort = 7;
+
+  repeated Statement operations = 8;
+
+}
+
+message ClientMessageResp {
+
+  enum RespType {
+    REGISTER = 1;
+    OPERATION = 2;
+  }
+
+  required RespType respType = 1;
+  required bool isError = 2;
+  optional string errorMsg = 3;
+  repeated bytes readValues = 4;
+}
+
+message DataMessageReq {
+  repeated Request requests = 1;
+
+  optional uint64 clientId = 2;
+  optional string clientHost = 3;
+  optional uint32 clientPort = 4;
+}
+
+message Request {
+  enum ReqType {
+    READ = 1;
+    WRITE = 2;
+    DELETE = 3;
+  }
+
+  required ReqType reqType = 1;
+  required uint64 opId = 2;
+  optional uint64 key = 3;
+  optional bytes value = 4;
+}
+
+message DataMessageResp {
+  repeated Request requests = 1;
+}
+

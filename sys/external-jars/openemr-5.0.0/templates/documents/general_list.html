@@ -1,0 +1,41 @@
+<html>
+<head>
+{php}html_header_show();{/php}
+{php}$this->assign('GLOBALS', $GLOBALS);{/php}
+
+<link rel="stylesheet" href="{$GLOBALS.css_header}" type="text/css">
+
+{literal}
+{/literal}
+
+<script type="text/javascript" src="{$WEBROOT}/library/js/DocumentTreeMenu.js"></script>
+</head>
+<!--<body bgcolor="{$STYLE.BGCOLOR2}">-->
+
+<!-- ViSolve - Call expandAll function on loading of the page if global value 'expand_document' is set -->
+{php} if ($GLOBALS['expand_document_tree']) {  {/php}
+  <body class="body_top" onload="javascript:objTreeMenu_1.expandAll();return false;">
+{php} } else { {/php}
+  <body class="body_top">
+{php} } {/php}
+
+<div id="documents_list">
+<a id="list_collapse" href="#" onclick="javascript:objTreeMenu_1.collapseAll();return false;">&nbsp;({xl t='Collapse all'})</a>
+<div class="title">{xl t='Documents'}</div>
+{$tree_html}
+</div>
+<div id="documents_actions">
+		{if $message}
+			<div class='text' style="margin-bottom:-10px; margin-top:-8px"><i>{$message}</i></div><br>
+		{/if}
+		{if $messages}
+            <div class='text' style="margin-bottom:-10px; margin-top:-8px"><i>{$messages}</i></div><br>
+		{/if}
+		{$activity}
+</div>
+<script type="text/javascript" src="{$GLOBALS.assets_static_relative}/jquery-min-3-1-1/index.js"></script>
+<script type="text/javascript">
+$("#list_collapse").detach().appendTo("#objTreeMenu_1_node_1 nobr");
+</script>
+</body>
+</html>

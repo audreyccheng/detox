@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- Connection details -->
+    <dbtype>postgres</dbtype>
+    <driver>org.postgresql.Driver</driver>
+    <DBUrl>jdbc:postgresql://localhost:5432/smallbank</DBUrl>
+    <DBRestHost>127.0.0.1</DBRestHost>
+    <username>postgres</username>
+    <password>password</password>
+    <isolation>TRANSACTION_SERIALIZABLE</isolation>
+    <uploadCode></uploadCode>
+    <uploadUrl></uploadUrl>
+    
+    <scalefactor>1</scalefactor>
+    
+    <!-- The workload -->
+    <terminals>1</terminals>
+    <works>
+        <work>
+          <warmup>30</warmup>
+          <time>20</time>
+          <rate>100</rate>
+          <weights>15,15,15,25,15,15</weights>
+        </work>
+    </works>
+        
+    <!-- SmallBank Procedures declaration -->
+    <transactiontypes>
+        <transactiontype>
+            <name>Amalgamate</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Balance</name>
+        </transactiontype>
+        <transactiontype>
+            <name>DepositChecking</name>
+        </transactiontype>
+        <transactiontype>
+            <name>SendPayment</name>
+        </transactiontype>
+        <transactiontype>
+            <name>TransactSavings</name>
+        </transactiontype>
+        <transactiontype>
+            <name>WriteCheck</name>
+        </transactiontype>
+    </transactiontypes>
+</parameters>

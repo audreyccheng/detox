@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- Connection details -->
+    <dbtype>postgres</dbtype>
+    <driver>org.postgresql.Driver</driver>
+    <DBUrl>jdbc:postgresql://localhost:5432/taobench</DBUrl>
+    <DBRestHost>127.0.0.1</DBRestHost>
+    <username>postgres</username>
+    <password>password</password>
+    <isolation>TRANSACTION_SERIALIZABLE</isolation>
+    <uploadCode></uploadCode>
+    <uploadUrl></uploadUrl>
+    
+    <scalefactor>1</scalefactor>
+    
+    <!-- The workload -->
+    <terminals>1</terminals>
+    <works>
+        <work>
+          <warmup>30</warmup>
+          <time>20</time>
+          <rate>100</rate>
+          <weights>59,25,2,1</weights>
+        </work>
+    </works>
+        
+    <!-- Taobench Procedures declaration -->
+    <transactiontypes>
+        <transactiontype>
+            <name>Read</name>
+        </transactiontype>
+        <transactiontype>
+            <name>ReadTxn</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Write</name>
+        </transactiontype>
+        <transactiontype>
+            <name>WriteTxn</name>
+        </transactiontype>
+    </transactiontypes>
+</parameters>
