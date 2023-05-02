@@ -49,20 +49,20 @@ public class ReadScan extends BenchmarkTransaction {
                         key = generator.generateZipf(0); // null-2 // + group2; // + group2
                     } else if (i < this.txnSize - 1) { //else { //
                         key = Generator.generateInt(0, group1); // null-2 // + group3; // + group3
+                    } else {
+                            key = Generator.generateInt(0, totalSize - group3) + group2; // // + group3; //
+    //                        System.out.printf("totalSize %d key %d\n", totalSize, key);
+                        }
+                        if (!keys.contains(key)) {
+                            objIdRand = key;
+                            keys.add(key);
+                        }
                     }
-                else {
-                        key = Generator.generateInt(0, totalSize - group3) + group2; // // + group3; //
-//                        System.out.printf("totalSize %d key %d\n", totalSize, key);
-                    }
-                    if (!keys.contains(key)) {
-                        objIdRand = key;
-                        keys.add(key);
-                    }
-                }
 
                 int x = Generator.generateInt(0,100);
                 ((RedisPostgresClient) client).read(TaoBenchConstants.kObjectsTable, objIdRand.toString(),
                         TaoBenchConstants.Transactions.SCAN.ordinal(), this.txn_id);
+            }
 //            System.out.printf("READ SCAN keys %s\n", keys.toString());
 
             results = client.execute();
