@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import com.google.protobuf.ByteString;
 
-import javax.rmi.CORBA.Util;
 import shield.config.NodeConfiguration;
 import shield.proxy.data.sync.SyncDynamoBackingStore;
 import shield.proxy.trx.data.Write;

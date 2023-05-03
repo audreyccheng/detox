@@ -8,6 +8,7 @@ public class TaoBenchConstants {
         READ,
         SCAN,
         WRITE,
+        UPDATE,
         READTRANSACTION,
         WRITETRANSACTION,
     }
