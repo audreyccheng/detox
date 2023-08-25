@@ -1,8 +1,6 @@
 # DeToX
 
-This repository contains code implementing DeToX, a transactional caching system. DeToX leverages insights on transactional hit rate to improve caching performance for transactional workloads.
-
-[Usenix OSDI2023 paper pdf](https://www.usenix.org/system/files/osdi23-cheng.pdf)
+This repository contains code implementing DeToX, a transactional caching system, for our [OSDI '23 paper](https://www.usenix.org/system/files/osdi23-cheng.pdf). DeToX leverages insights on transactional hit rate to improve caching performance for transactional workloads.
 
 In addition to DeToX, this repository contains:
 1. A modified version of [ChronoCache](https://github.com/bglasber/chronocache), a middleware predictive query caching system, that measures transactional hit rate, integrates with Redis, and supports several benchmarks not available for the original system.
