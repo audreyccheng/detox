@@ -186,7 +186,7 @@ public class NodeConfiguration extends Configuration {
   public boolean ORAM_ENCRYPT_BLOCKS = true;
 
   public boolean ORAM_DURABLE = false;
-  
+
   public int ORAM_DURABLE_CHECKPOINT_FREQ = 5;
   public int ORAM_DURABLE_CHECKPOINT_POSITION_MAP = 0;
   public int ORAM_DURABLE_CHECKPOINT_VALID_MAP = 1;
@@ -204,7 +204,7 @@ public class NodeConfiguration extends Configuration {
    * Type of CC Manager to instantiate
    */
   public TransactionManager.CCManagerType CC_MANAGER_TYPE =
-      TransactionManager.CCManagerType.BATCH;
+          TransactionManager.CCManagerType.BATCH;
 
   public TransactionManager.CCManagerType fromStringToCC(String ccType) {
     if (ccType.equals("nobatch")) {
@@ -219,17 +219,17 @@ public class NodeConfiguration extends Configuration {
    */
 
   public IAsyncBackingStore.BackingStoreType BACKING_STORE_TYPE =
-      IAsyncBackingStore.BackingStoreType.NORAM_HASHMAP;
+          IAsyncBackingStore.BackingStoreType.NORAM_HASHMAP;
 
   /**
    * Type of backing store to instantiate remotely;
    */
   public IAsyncBackingStore.BackingStoreType REMOTE_BACKING_STORE_TYPE =
-      IAsyncBackingStore.BackingStoreType.NORAM_HASHMAP;
+          IAsyncBackingStore.BackingStoreType.NORAM_HASHMAP;
 
 
   public IAsyncBackingStore.BackingStoreType fromStringToDataStore(
-      String backingStoreType) {
+          String backingStoreType) {
     System.out.println("Storage: " + backingStoreType);
     if (backingStoreType.equals("noram_hashmap")) {
       return IAsyncBackingStore.BackingStoreType.NORAM_HASHMAP;
@@ -408,7 +408,7 @@ public class NodeConfiguration extends Configuration {
 
   public String RDS_PASSWORD =  "lorenzo";
 
-   //public String RDS_HOSTNAME = "testmysql.ccr4lwwrpfus.us-east-2.rds.amazonaws.com";
+  //public String RDS_HOSTNAME = "testmysql.ccr4lwwrpfus.us-east-2.rds.amazonaws.com";
 
   public String RDS_HOSTNAME = "172.31.37.253";
 
@@ -424,6 +424,10 @@ public class NodeConfiguration extends Configuration {
   public boolean REDIS_ENABLED = true;
   public boolean REDIS_PREFETCH = true;
   public long LATENCY = 0;
+  public double PREFETCH_FREQ_THRESH = 0.2;
+  public double PREFETCH_LEN_THRESH = 5;
+  // Indicates whether we send SQL requests to postgres or KV requests to TiKV
+  public boolean USE_SQL = false;
 
   public String POSTGRES_HOSTNAME = "";
   public String POSTGRES_PORT = "5432";
@@ -500,7 +504,7 @@ public class NodeConfiguration extends Configuration {
   public StatisticsCollector statsStorageWritesPerBatch = null;
 
   public NodeConfiguration(String configFileName)
-      throws IOException, ParseException {
+          throws IOException, ParseException {
     this.configFileName = configFileName;
     if (configFileName != null) {
       loadProperties(configFileName);
@@ -518,7 +522,7 @@ public class NodeConfiguration extends Configuration {
    * also add the ability to parse it in this file
    */
   public void loadProperties(String fileName)
-      throws IOException, ParseException {
+          throws IOException, ParseException {
 
     FileReader reader = new FileReader(fileName);
     if (fileName == "") {
@@ -533,53 +537,53 @@ public class NodeConfiguration extends Configuration {
     isInitialised = true;
 
     LOGGING_LEVEL =
-        fromStringToLogging(getPropString(prop, "logging_level", ""));
+            fromStringToLogging(getPropString(prop, "logging_level", ""));
     NODE_UID = getPropLong(prop, "node_uid", NODE_UID);
     REQ_THREADS_PER_BM_THREAD = getPropInt(prop, "req_threads_per_bm_thread", REQ_THREADS_PER_BM_THREAD);
     N_WORKER_THREADS = getPropInt(prop, "n_worker_threads", N_WORKER_THREADS);
     N_RECEIVER_NET_THREADS =
-        getPropInt(prop, "n_receiver_net_threads", N_RECEIVER_NET_THREADS);
+            getPropInt(prop, "n_receiver_net_threads", N_RECEIVER_NET_THREADS);
     N_SENDER_NET_THREADS =
-        getPropInt(prop, "n_sender_net_threads", N_SENDER_NET_THREADS);
+            getPropInt(prop, "n_sender_net_threads", N_SENDER_NET_THREADS);
     N_RECEIVER_NET_THREADS =
-        getPropInt(prop, "n_receiver_net_threads", N_RECEIVER_NET_THREADS);
+            getPropInt(prop, "n_receiver_net_threads", N_RECEIVER_NET_THREADS);
     PROXY_IP_ADDRESS =
-        getPropString(prop, "proxy_ip_address", PROXY_IP_ADDRESS);
+            getPropString(prop, "proxy_ip_address", PROXY_IP_ADDRESS);
     PROXY_LISTENING_PORT =
-        getPropInt(prop, "proxy_listening_port", PROXY_LISTENING_PORT);
+            getPropInt(prop, "proxy_listening_port", PROXY_LISTENING_PORT);
     NODE_IP_ADDRESS = getPropString(prop, "node_ip_address", NODE_IP_ADDRESS);
     NODE_LISTENING_PORT =
-        getPropInt(prop, "node_listening_port", NODE_LISTENING_PORT);
+            getPropInt(prop, "node_listening_port", NODE_LISTENING_PORT);
     MAX_NB_STRIDE = getPropInt(prop, "max_nb_stride", MAX_NB_STRIDE);
     STRIDE_SIZE = getPropInt(prop, "stride_size", STRIDE_SIZE);
     WRITES_SIZE = getPropInt(prop, "writes_size", WRITES_SIZE);
     MAX_PENDING_BATCHES =
-        getPropInt(prop, "max_pending_batches", MAX_PENDING_BATCHES);
+            getPropInt(prop, "max_pending_batches", MAX_PENDING_BATCHES);
     TIME_BETWEEN_STRIDE =
-        getPropInt(prop, "min_between_stride", TIME_BETWEEN_STRIDE);
+            getPropInt(prop, "min_between_stride", TIME_BETWEEN_STRIDE);
     FINALISE_BATCH_BUFFER_T =
-        getPropInt(prop, "finalise_batch_buffer_t", FINALISE_BATCH_BUFFER_T);
+            getPropInt(prop, "finalise_batch_buffer_t", FINALISE_BATCH_BUFFER_T);
     DB_FILE_NAME = getPropString(prop, "db_file_path", DB_FILE_NAME);
     KV_NAME = getPropString(prop, "kv_name", KV_NAME);
     DB_IN_MEMORY = getPropBool(prop, "db_in_memory", DB_IN_MEMORY);
     CC_MANAGER_TYPE =
-        fromStringToCC(getPropString(prop, "cc_manager_type", ""));
+            fromStringToCC(getPropString(prop, "cc_manager_type", ""));
     BACKING_STORE_TYPE =
-        fromStringToDataStore(getPropString(prop, "backing_store_type", ""));
+            fromStringToDataStore(getPropString(prop, "backing_store_type", ""));
     REMOTE_BACKING_STORE_TYPE =
-        fromStringToDataStore(getPropString(prop, "remote_backing_store_type", ""));
+            fromStringToDataStore(getPropString(prop, "remote_backing_store_type", ""));
     REMOTE_STORE_IP_ADDRESS =
-        getPropString(prop, "remote_store_ip_address", REMOTE_STORE_IP_ADDRESS);
+            getPropString(prop, "remote_store_ip_address", REMOTE_STORE_IP_ADDRESS);
     REMOTE_STORE_LISTENING_PORT = getPropInt(prop,
-        "remote_store_listening_port", REMOTE_STORE_LISTENING_PORT);
+            "remote_store_listening_port", REMOTE_STORE_LISTENING_PORT);
     GC_ACTIVATED = getPropBool(prop, "gc_activated", GC_ACTIVATED);
     if (CC_MANAGER_TYPE == CCManagerType.BATCH) GC_ACTIVATED = false;
     GC_THREADS = getPropInt(prop, "gc_threads", GC_THREADS);
-     COMMIT_ON_DURABLE =
-     //   getPropBool(prop, "commit_on_durable", COMMIT_ON_DURABLE);
-         true;
+    COMMIT_ON_DURABLE =
+            //   getPropBool(prop, "commit_on_durable", COMMIT_ON_DURABLE);
+            true;
     MAX_COLUMN_SIZE =
-        getPropInt(prop, "max_column_size", MAX_COLUMN_SIZE);
+            getPropInt(prop, "max_column_size", MAX_COLUMN_SIZE);
     ALLOW_DUPLICATES =  getPropBool(prop, "allow_duplicates", ALLOW_DUPLICATES);
     READ_FOR_UPDATE = getPropBool(prop, "read_for_update", READ_FOR_UPDATE);
 
@@ -611,23 +615,23 @@ public class NodeConfiguration extends Configuration {
     ORAM_DURABLE_MAX_STASH_SIZE = getPropInt(prop, "oram_durable_max_stash_size", ORAM_DURABLE_MAX_STASH_SIZE);
 
     AWS_TRX_TABLE_NAME =
-        getPropString(prop, "aws_trx_table_name", AWS_TRX_TABLE_NAME);
+            getPropString(prop, "aws_trx_table_name", AWS_TRX_TABLE_NAME);
     AWS_TRX_IMAGES_TABLE_NAME = getPropString(prop, "aws_trx_images_table_name",
-        AWS_TRX_IMAGES_TABLE_NAME);
+            AWS_TRX_IMAGES_TABLE_NAME);
     AWS_ACCESS_KEY = getPropString(prop, "aws_access_key", AWS_ACCESS_KEY);
     AWS_SECRET_KEY = getPropString(prop, "aws_secret_key", AWS_SECRET_KEY);
 
     AWS_BASE_TABLE_NAME = getPropString(prop, "aws_base_table_name", AWS_BASE_TABLE_NAME);
     AWS_BASE_TABLE_HASH_KEY = getPropString(prop, "aws_base_table_hash_key", AWS_BASE_TABLE_HASH_KEY);
     AWS_BASE_TABLE_VALUE_KEY =
-        getPropString(prop, "aws_base_table_value_key", AWS_BASE_TABLE_VALUE_KEY);
+            getPropString(prop, "aws_base_table_value_key", AWS_BASE_TABLE_VALUE_KEY);
 
     AWS_RCUS = getPropLong(prop, "aws_rcus", AWS_RCUS);
     AWS_WCUS = getPropLong(prop, "aws_wcus", AWS_WCUS);
 
     AWS_ACCESS_REGION = getPropString(prop, "aws_access_region", AWS_ACCESS_REGION);
     AWS_ACCESS_POINT =
-        "http://dynamodb." + AWS_ACCESS_REGION + ".amazonaws.com";
+            "http://dynamodb." + AWS_ACCESS_REGION + ".amazonaws.com";
 
     RDS_PASSWORD = getPropString(prop, "rds_password", RDS_PASSWORD);
     RDS_USERNAME = getPropString(prop, "rds_username", RDS_USERNAME);
@@ -642,6 +646,9 @@ public class NodeConfiguration extends Configuration {
     REDIS_ENABLED = getPropBool(prop, "redis_enabled", REDIS_ENABLED);
     REDIS_PREFETCH = getPropBool(prop, "redis_prefetch", REDIS_PREFETCH);
     LATENCY = getPropLong(prop, "latency", LATENCY);
+    PREFETCH_FREQ_THRESH = getPropDouble(prop, "prefetch_freq_thresh", PREFETCH_FREQ_THRESH);
+    PREFETCH_LEN_THRESH = getPropDouble(prop, "prefetch_len_thresh", PREFETCH_LEN_THRESH);
+    USE_SQL = getPropBool(prop, "use_sql", USE_SQL);
 
     POSTGRES_HOSTNAME = getPropString(prop, "postgres_hostname", POSTGRES_HOSTNAME);
     POSTGRES_PORT = getPropString(prop, "postgres_port", POSTGRES_PORT);
