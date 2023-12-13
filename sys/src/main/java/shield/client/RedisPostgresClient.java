@@ -39,18 +39,6 @@ import java.util.stream.Collectors;
  */
 public final class RedisPostgresClient extends ClientBase {
 
-  // TODO: Make this config parameters
-  private static final double PREFETCH_FREQ_THRESH = 0.2;
-  private static final double PREFETCH_LEN_THRES = 5;
-
-
-  /**
-   * Indicates whether we send SQL requests to postgres or KV requests to TiKV
-   *
-   * TODO: move this to config
-   */
-  private static boolean USE_SQL = false;
-
   private class PrefetchTracker {
     List<PrefetchSet> sets;
     int totalFreq;
@@ -77,7 +65,7 @@ public final class RedisPostgresClient extends ClientBase {
       this.sets.sort((o1, o2) -> Long.compare(o2.freq, o1.freq));
 
       // Enforce maximum number of sets
-      if (sets.size() > PREFETCH_LEN_THRES) {
+      if (sets.size() > config.PREFETCH_LEN_THRESH) {
         this.trackDeps = false;
       }
     }
@@ -231,7 +219,7 @@ public final class RedisPostgresClient extends ClientBase {
     this.requestExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(config.REQ_THREADS_PER_BM_THREAD);
 
     tableNames = new HashSet<String>();
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       String jdbcUrl = "jdbc:postgresql://" + config.POSTGRES_HOSTNAME + ":" +
               config.POSTGRES_PORT + "/" + config.POSTGRES_DB_NAME + "?user=" + config.POSTGRES_USERNAME + "&password="
               + config.POSTGRES_PASSWORD;
@@ -275,7 +263,7 @@ public final class RedisPostgresClient extends ClientBase {
 
   private void createTable(String tableName) {
 //    System.out.println("CREATING TABLE " + tableName);
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       String createTable = (
               "CREATE TABLE " + tableName +
                       "(id BIGINT not null, " +
@@ -301,7 +289,7 @@ public final class RedisPostgresClient extends ClientBase {
   @Override
   public synchronized void registerClient() throws DatabaseAbortException {
     assert this.threadNumber >= 0;
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       try {
         connection.setAutoCommit(false);
         // connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
@@ -423,7 +411,7 @@ public final class RedisPostgresClient extends ClientBase {
 
   @Override
   public List<byte[]> readAndExecute(String table, String key) throws DatabaseAbortException {
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       return null;
       // todo: check why this is null
     } else {
@@ -434,7 +422,7 @@ public final class RedisPostgresClient extends ClientBase {
   public synchronized List<byte[]> readAndExecute(String table, String row, int txn_type, long txn_id)
           throws DatabaseAbortException {
     try {
-      if (USE_SQL) {
+      if (config.USE_SQL) {
         // Generate and send any non-executed statements
         createReadStatement(table, row, txn_type, txn_id);
       } else {
@@ -459,7 +447,7 @@ public final class RedisPostgresClient extends ClientBase {
    * @see shield.client.ClientBase#read(java.lang.String)
    */
   public synchronized void read(String tableName, String row, int txn_type, long txn_id) throws DatabaseAbortException {
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       try {
         createReadStatement(tableName, row, txn_type, txn_id);
       } catch (SQLException e) {
@@ -476,7 +464,7 @@ public final class RedisPostgresClient extends ClientBase {
   }
 
   public void reset() {
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       pendingStatements.clear();
       pendingStatements.clear();
       pendingStatements.clear();
@@ -496,7 +484,7 @@ public final class RedisPostgresClient extends ClientBase {
   public void handleError(SQLException e)
           throws DatabaseAbortException {
     // Return read values
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       try {
         connection.rollback();
         e.printStackTrace();
@@ -529,7 +517,7 @@ public final class RedisPostgresClient extends ClientBase {
   public synchronized List<byte[]> readForUpdateAndExecute(String table, String row, int txn_type, long txn_id)
           throws DatabaseAbortException {
     try {
-      if (USE_SQL) {
+      if (config.USE_SQL) {
         createReadForUpdateStatement(table, row, txn_type, txn_id);
       } else {
         readForUpdate(table, row);
@@ -550,7 +538,7 @@ public final class RedisPostgresClient extends ClientBase {
 
   public synchronized void readForUpdate(String tableName, String row, int txn_type, long txn_id)
           throws DatabaseAbortException {
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       try {
         createReadForUpdateStatement(tableName, row, txn_type, txn_id);
       } catch (SQLException e) {
@@ -573,7 +561,7 @@ public final class RedisPostgresClient extends ClientBase {
   }
 
   public synchronized void delete(String tableName, String row, int txn_type, long txn_id) throws DatabaseAbortException {
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       try {
         createDeleteStatement(tableName, row, txn_type, txn_id);
       } catch (SQLException e) {
@@ -601,7 +589,7 @@ public final class RedisPostgresClient extends ClientBase {
   public synchronized List<byte[]> deleteAndExecute(String table, String row, int txn_type, long txn_id)
           throws DatabaseAbortException {
     try {
-      if (USE_SQL) {
+      if (config.USE_SQL) {
         createDeleteStatement(table, row, txn_type, txn_id);
       } else {
         delete(table, row, txn_type, txn_id);
@@ -626,7 +614,7 @@ public final class RedisPostgresClient extends ClientBase {
    */
   public void write(String table, String row, byte[] value, int txn_type, long txn_id) throws DatabaseAbortException {
 //    System.out.println("DEBUG: " + table + row);
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       try {
         createWriteStatement(table, row, value, txn_type, txn_id);
       } catch (SQLException e) {
@@ -652,7 +640,7 @@ public final class RedisPostgresClient extends ClientBase {
 
   @Override
   public void update(String table, String key, byte[] value) throws DatabaseAbortException {
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       update(table, key, value, -1, -1);
     } else {
       write(table, key, value, -1, -1);
@@ -665,7 +653,7 @@ public final class RedisPostgresClient extends ClientBase {
    * @see shield.client.ClientBase#update(java.lang.String, byte[])
    */
   public void update(String table, String row, byte[] value, int txn_type, long txn_id) throws DatabaseAbortException {
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       try {
         createUpdateStatement(table, row, value, txn_type, txn_id);
       } catch (SQLException e) {
@@ -691,7 +679,7 @@ public final class RedisPostgresClient extends ClientBase {
           throws DatabaseAbortException {
 
     try {
-      if (USE_SQL) {
+      if (config.USE_SQL) {
         createUpdateStatement(table, row, value, txn_type, txn_id);
       } else {
         write(table, row, value, txn_type, txn_id);
@@ -714,7 +702,7 @@ public final class RedisPostgresClient extends ClientBase {
           throws DatabaseAbortException {
 
     try {
-      if (USE_SQL) {
+      if (config.USE_SQL) {
         createWriteStatement(table, row, value, txn_type, txn_id);
       } else {
         write(table, row, value, -1, 1);
@@ -743,7 +731,7 @@ public final class RedisPostgresClient extends ClientBase {
     try {
       List<byte[]> results = executeOps();
 
-      if (USE_SQL) {
+      if (config.USE_SQL) {
         connection.commit();
       } else {
         while (pendingTiKVWrites.size() > 0) {
@@ -787,7 +775,7 @@ public final class RedisPostgresClient extends ClientBase {
    */
   @Override
   public synchronized void abortTransaction() throws DatabaseAbortException {
-    if (USE_SQL) {
+    if (config.USE_SQL) {
       try {
         pendingStatements.clear();
         connection.rollback();
@@ -878,7 +866,7 @@ public final class RedisPostgresClient extends ClientBase {
         }
       }
 
-      if (USE_SQL) {
+      if (config.USE_SQL) {
         try {
 //        if (config.LATENCY > 0) {
 //          Thread.sleep(config.LATENCY);
@@ -970,7 +958,7 @@ public final class RedisPostgresClient extends ClientBase {
    */
   public synchronized LinkedList<byte[]> executeOps() throws DatabaseAbortException, SQLException {
 
-    if (!USE_SQL) {
+    if (!config.USE_SQL) {
       return executeOpsTiKV();
     }
 
@@ -1028,7 +1016,7 @@ public final class RedisPostgresClient extends ClientBase {
 
         PrefetchTracker tracker = prefetchMap.get(prefetchIndex);
 //        System.out.printf("[TXN PROJ %d] %s prefetch object: %s\n", this.threadNumber, prefetchIndex, tracker == null ? "NULL" : tracker.toString());
-        if (tracker != null && tracker.trackDeps && tracker.sets.size() > 0 && ((double) tracker.sets.get(0).freq) / tracker.totalFreq > PREFETCH_FREQ_THRESH)
+        if (tracker != null && tracker.trackDeps && tracker.sets.size() > 0 && ((double) tracker.sets.get(0).freq) / tracker.totalFreq > config.PREFETCH_FREQ_THRESH)
           prefetchKeys.addAll(tracker.sets.get(0).keys);
       }
 
@@ -1210,7 +1198,7 @@ public final class RedisPostgresClient extends ClientBase {
 
         PrefetchTracker tracker = prefetchMap.get(prefetchIndex);
 //        System.out.printf("[TXN PROJ %d] %s prefetch object: %s\n", this.threadNumber, prefetchIndex, tracker == null ? "NULL" : tracker.toString());
-        if (tracker != null && tracker.trackDeps && tracker.sets.size() > 0 && ((double) tracker.sets.get(0).freq) / tracker.totalFreq > PREFETCH_FREQ_THRESH)
+        if (tracker != null && tracker.trackDeps && tracker.sets.size() > 0 && ((double) tracker.sets.get(0).freq) / tracker.totalFreq > config.PREFETCH_FREQ_THRESH)
           prefetchKeys.addAll(tracker.sets.get(0).keys);
       }
 
